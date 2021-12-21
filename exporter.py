@@ -8,17 +8,36 @@ import os
 from traceback import print_exc
 from time import perf_counter
 
+# Gateway info
 GATEWAY_NAME = os.environ.get('GATEWAY_NAME', 'trashcan')
 GATEWAY_URL = os.environ.get('GATEWAY_URL', 'http://192.168.12.1')
 
-# How long to wait in between scrapes
-SCRAPE_DELAY = int(os.environ.get('SCRAPE_DELAY', 5))
+# Scraping settings
+SCRAPE_DELAY = int(os.environ.get('SCRAPE_DELAY', 10))
 
+# ClickHouse login info
 CLICKHOUSE_URL = os.environ['CLICKHOUSE_URL']
 CLICKHOUSE_USER = os.environ['CLICKHOUSE_USER']
 CLICKHOUSE_PASS = os.environ['CLICKHOUSE_PASS']
 CLICKHOUSE_DB = os.environ['CLICKHOUSE_DB']
 
+# ClickHouse table names
+FIVEG_TABLE = os.environ.get(
+    '5G_TABLE',
+    'cell_5g'
+)
+LTE_TABLE = os.environ.get(
+    'LTE_TABLE',
+    'cell_lte'
+)
+INTERFACES_TABLE = os.environ.get(
+    'INTERFACES_TABLE',
+    'cell_interfaces'
+)
+STATUS_TABLE = os.environ.get(
+    'STATUS_TABLE',
+    'cell_status'
+)
 class Exporter:
     async def start(self):
         # Create a ClientSession that doesn't verify SSL certificates
@@ -54,7 +73,7 @@ class Exporter:
                 timestamp = datetime.datetime.now(tz=datetime.timezone.utc).timestamp()
                 try:
                     await self.clickhouse.execute(
-                        "INSERT INTO cell_5g_status_buffer (device, physical_cell_id, snr, rsrp, rsrp_strength_index, rsrq, downlink_arfcn, signal_strength_level, band, time) VALUES",
+                        f"INSERT INTO {FIVEG_TABLE} (device, physical_cell_id, snr, rsrp, rsrp_strength_index, rsrq, downlink_arfcn, signal_strength_level, band, time) VALUES",
                         (
                             GATEWAY_NAME,
                             radio_data['cell_5G_stats_cfg'][0]['stat']['PhysicalCellID'],
@@ -73,7 +92,7 @@ class Exporter:
                     pass
                 try:
                     await self.clickhouse.execute(
-                        "INSERT INTO cell_lte_status_buffer (device, physical_cell_id, rssi, snr, rsrp, rsrp_strength_index, rsrq, downlink_arfcn, signal_strength_level, band, time) VALUES",
+                        f"INSERT INTO {LTE_TABLE} (device, physical_cell_id, rssi, snr, rsrp, rsrp_strength_index, rsrq, downlink_arfcn, signal_strength_level, band, time) VALUES",
                         (
                             GATEWAY_NAME,
                             radio_data['cell_LTE_stats_cfg'][0]['stat']['PhysicalCellID'],
@@ -93,7 +112,7 @@ class Exporter:
                     pass
 
                 await self.clickhouse.execute(
-                    "INSERT INTO cell_device_status_buffer (device, uptime, connected, version, model, ipv4_address, ipv6_address, eth_devices, wlan_devices, scrape_latency) VALUES",
+                    f"INSERT INTO {STATUS_TABLE} (device, uptime, connected, version, model, ipv4_address, ipv6_address, eth_devices, wlan_devices, scrape_latency) VALUES",
                     (
                         GATEWAY_NAME,
                         device_data['device_app_status'][0]['UpTime'],
@@ -182,7 +201,7 @@ class Exporter:
 
                 # Batch insert the data into the buffer
                 await self.clickhouse.execute(
-                    "INSERT INTO cell_interfaces_buffer (device, interface, bytes_in, bytes_out, packets_in, packets_out, time) VALUES",
+                    f"INSERT INTO {INTERFACES_TABLE} (device, interface, bytes_in, bytes_out, packets_in, packets_out, time) VALUES",
                     *interfaces
                 )
                 print(f'Update took {round(latency, 2)}s')

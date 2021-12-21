@@ -1,8 +1,8 @@
 -- PLEASE NOTE
--- These buffer tables are what I personally use to do batch inserts
+-- These buffer tables are what I personally use to buffer and batch inserts
 -- You may have to modify them to work in your setup
 
-CREATE TABLE cell_device_status (
+CREATE TABLE cell_status (
         device LowCardinality(String),
         uptime bigint,
         connected boolean,
@@ -16,7 +16,7 @@ CREATE TABLE cell_device_status (
         time DateTime DEFAULT now()
     ) ENGINE = MergeTree() PARTITION BY toDate(time) ORDER BY (device, time) PRIMARY KEY (device, time);
 
-CREATE TABLE cell_device_status_buffer (
+CREATE TABLE cell_status_buffer (
         device LowCardinality(String),
         uptime bigint,
         connected boolean,
@@ -28,7 +28,7 @@ CREATE TABLE cell_device_status_buffer (
         wlan_devices smallint DEFAULT 0,
         scrape_latency float,
         time DateTime DEFAULT now()
-    ) ENGINE = Buffer(homelab, cell_device_status, 1, 10, 10, 10, 100, 10000, 10000);
+    ) ENGINE = Buffer(homelab, cell_status, 1, 10, 10, 10, 100, 10000, 10000);
 
 CREATE TABLE cell_interfaces (
         device LowCardinality(String),
@@ -50,7 +50,7 @@ CREATE TABLE cell_interfaces_buffer (
         time DateTime DEFAULT now()
     ) ENGINE = Buffer(homelab, cell_interfaces, 1, 10, 10, 10, 100, 10000, 10000);
 
-CREATE TABLE cell_5g_status (
+CREATE TABLE cell_5g (
         device LowCardinality(String),
         physical_cell_id smallint,
         snr tinyint,
@@ -63,7 +63,7 @@ CREATE TABLE cell_5g_status (
         time DateTime DEFAULT now()
     ) ENGINE = MergeTree() PARTITION BY toDate(time) ORDER BY (device, physical_cell_id, time) PRIMARY KEY (device, physical_cell_id, time);
 
-CREATE TABLE cell_5g_status_buffer (
+CREATE TABLE cell_5g_buffer (
         device LowCardinality(String),
         physical_cell_id smallint,
         snr tinyint,
@@ -74,9 +74,9 @@ CREATE TABLE cell_5g_status_buffer (
         signal_strength_level tinyint,
         band LowCardinality(String),
         time DateTime DEFAULT now()
-    ) ENGINE = Buffer(homelab, cell_5g_status, 1, 10, 10, 10, 100, 10000, 10000);
+    ) ENGINE = Buffer(homelab, cell_5g, 1, 10, 10, 10, 100, 10000, 10000);
 
-CREATE TABLE cell_lte_status (
+CREATE TABLE cell_lte (
         device LowCardinality(String),
         physical_cell_id smallint,
         rssi smallint,
@@ -90,7 +90,7 @@ CREATE TABLE cell_lte_status (
         time DateTime DEFAULT now()
     ) ENGINE = MergeTree() PARTITION BY toDate(time) ORDER BY (device, physical_cell_id, time) PRIMARY KEY (device, physical_cell_id, time);
 
-CREATE TABLE cell_lte_status_buffer (
+CREATE TABLE cell_lte_buffer (
         device LowCardinality(String),
         physical_cell_id smallint,
         rssi smallint,
@@ -102,4 +102,4 @@ CREATE TABLE cell_lte_status_buffer (
         signal_strength_level tinyint,
         band LowCardinality(String),
         time DateTime DEFAULT now()
-    ) ENGINE = Buffer(homelab, cell_lte_status, 1, 10, 10, 10, 100, 10000, 10000);
+    ) ENGINE = Buffer(homelab, cell_lte, 1, 10, 10, 10, 100, 10000, 10000);
