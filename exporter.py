@@ -87,7 +87,7 @@ class Exporter:
                             timestamp
                         )
                     )
-                except (KeyError, IndexError):
+                except (aiochclient.exceptions.ChClientError, KeyError, IndexError):
                     # In case 5G isn't connected
                     pass
                 try:
@@ -107,7 +107,7 @@ class Exporter:
                             timestamp
                         )
                     )
-                except (KeyError, IndexError):
+                except (aiochclient.exceptions.ChClientError, KeyError, IndexError):
                     # In case LTE isn't connected
                     pass
 
