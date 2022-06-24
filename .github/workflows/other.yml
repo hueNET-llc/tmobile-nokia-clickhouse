@@ -1,0 +1,15 @@
+name: Other - Build only
+
+on:
+  workflow_dispatch:
+    branches-ignore: [ master ]
+  push:
+    branches-ignore: [ master ]
+
+jobs:
+  build:
+    runs-on: [ self-hosted ]
+    steps:
+      - uses: actions/checkout@v3
+      - name: Build image
+        run: docker build -t ${{ secrets.DOCKER_USER }}/tmobile-nokia-clickhouse:latest .
