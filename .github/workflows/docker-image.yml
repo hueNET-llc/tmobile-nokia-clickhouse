@@ -1,23 +1,21 @@
-name: Docker Image CI
-runs-on: 
+name: Docker Hub
 
 on:
+  workflow_dispatch:
+    branches: [ master ]
   push:
-    branches: [ "master" ]
+    branches: [ master ]
 
 jobs:
   build:
     runs-on: [ self-hosted ]
     steps:
-      - uses: actions/checkout@v2
-      - name: Login
-        env:
-          DOCKER_USER: ${{secrets.DOCKER_USER}}
-          DOCKER_TOKEN: ${{secrets.DOCKER_TOKEN}}
-        run: docker login -u $DOCKER_USER -p $DOCKER_TOKEN
-      - name: Build
-        run: |
-          docker build -t tmobile-nokia-clickhouse:latest .
-      - name: Push
-        run: |
-          docker push ${{secrets.DOCKER_USER}}/tmobile-nokia-clickhouse
+      - uses: actions/checkout@v3
+      - uses: docker/login-action@v2
+        with:
+          username: ${{ secrets.DOCKER_USER }}
+          password: ${{ secrets.DOCKER_TOKEN }}
+      - name: Build image
+        run: docker build -t ${{ secrets.DOCKER_USER }}/tmobile-nokia-clickhouse:latest .
+      - name: Push to Docker Hub
+        run: docker push ${{ secrets.DOCKER_USER }}/tmobile-nokia-clickhouse:latest
