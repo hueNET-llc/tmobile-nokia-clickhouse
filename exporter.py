@@ -23,19 +23,19 @@ CLICKHOUSE_DB = os.environ['CLICKHOUSE_DB']
 
 # ClickHouse table names
 FIVEG_TABLE = os.environ.get(
-    '5G_TABLE',
+    'CLICKHOUSE_5G_TABLE',
     'cell_5g'
 )
 LTE_TABLE = os.environ.get(
-    'LTE_TABLE',
+    'CLICKHOUSE_LTE_TABLE',
     'cell_lte'
 )
 INTERFACES_TABLE = os.environ.get(
-    'INTERFACES_TABLE',
+    'CLICKHOUSE_INTERFACES_TABLE',
     'cell_interfaces'
 )
 STATUS_TABLE = os.environ.get(
-    'STATUS_TABLE',
+    'CLICKHOUSE_STATUS_TABLE',
     'cell_status'
 )
 class Exporter:
