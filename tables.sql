@@ -33,20 +33,20 @@ CREATE TABLE cell_status_buffer (
 CREATE TABLE cell_interfaces (
         device LowCardinality(String),
         interface LowCardinality(String),
-        bytes_in int,
-        bytes_out int,
-        packets_in Nullable(int),
-        packets_out Nullable(int),
+        bytes_in UInt64,
+        bytes_out UInt64,
+        packets_in Nullable(UInt64),
+        packets_out Nullable(UInt64),
         time DateTime DEFAULT now()
     ) ENGINE = MergeTree() PARTITION BY toDate(time) ORDER BY (device, interface, time) PRIMARY KEY (device, interface, time);
 
 CREATE TABLE cell_interfaces_buffer (
         device LowCardinality(String),
         interface LowCardinality(String),
-        bytes_in int,
-        bytes_out int,
-        packets_in Nullable(int),
-        packets_out Nullable(int),
+        bytes_in UInt64,
+        bytes_out UInt64,
+        packets_in Nullable(UInt64),
+        packets_out Nullable(UInt64),
         time DateTime DEFAULT now()
     ) ENGINE = Buffer(homelab, cell_interfaces, 1, 10, 10, 10, 100, 10000, 10000);
 

@@ -129,6 +129,26 @@ class Exporter:
 
                 interfaces = []
 
+                # IMPORTANT: The interface counters seem to randomly overflow (example below)
+                # Make sure to apply max() to the counters to prevent this
+                # ┌────────────────time─┬─interface─┬────bytes_in─┐
+                # │ 2022-12-02 23:59:44 │ cell      │ -2047731018 │
+                # │ 2022-12-02 23:59:57 │ cell      │ -2043702372 │
+                # └─────────────────────┴───────────┴─────────────┘
+                # ┌────────────────time─┬─interface─┬───bytes_in─┐
+                # │ 2022-12-01 23:59:42 │ br0       │ -922068449 │
+                # │ 2022-12-01 23:59:53 │ br0       │ -922028830 │
+                # │ 2022-12-01 23:59:42 │ eth0      │ -623448961 │
+                # │ 2022-12-01 23:59:53 │ eth0      │ -623405626 │
+                # └─────────────────────┴───────────┴────────────┘
+                # ┌────────────────time─┬─interface─┬────bytes_in─┐
+                # │ 2022-11-30 23:59:40 │ br0       │ -1257435445 │
+                # │ 2022-11-30 23:59:51 │ br0       │ -1257397732 │
+                # │ 2022-11-30 23:59:40 │ cell      │   -76842077 │
+                # │ 2022-11-30 23:59:51 │ cell      │   -76792249 │
+                # └─────────────────────┴───────────┴─────────────┘
+
+
                 # Ethernet ports
                 for iface_num in range(len(lan_data['lan_ether'])):
                     iface = lan_data['lan_ether'][iface_num]
@@ -139,10 +159,10 @@ class Exporter:
                         interfaces.append((
                             GATEWAY_NAME,
                             f'eth{iface_num}',
-                            iface["stat"]["BytesReceived"],
-                            iface["stat"]["BytesSent"],
-                            iface["stat"]["PacketsReceived"],
-                            iface["stat"]["PacketsSent"],
+                            max(iface["stat"]["BytesReceived"], 0),
+                            max(iface["stat"]["BytesSent"], 0),
+                            max(iface["stat"]["PacketsReceived"], 0),
+                            max(iface["stat"]["PacketsSent"], 0),
                             timestamp
                         ))
                     except KeyError:
@@ -158,10 +178,10 @@ class Exporter:
                         interfaces.append((
                             GATEWAY_NAME,
                             f'wlan{iface_num}',
-                            iface["TotalBytesReceived"],
-                            iface["TotalBytesSent"],
-                            iface["TotalPacketsReceived"],
-                            iface["TotalPacketsSent"],
+                            max(iface["TotalBytesReceived"], 0),
+                            max(iface["TotalBytesSent"], 0),
+                            max(iface["TotalPacketsReceived"], 0),
+                            max(iface["TotalPacketsSent"], 0),
                             timestamp
                         ))
                     except KeyError:
@@ -173,10 +193,10 @@ class Exporter:
                     interfaces.append((
                         GATEWAY_NAME,
                         'br0',
-                        iface["X_ASB_COM_RxBytes"],
-                        iface["X_ASB_COM_TxBytes"],
-                        iface["X_ASB_COM_RxPackets"],
-                        iface["X_ASB_COM_TxPackets"],
+                        max(iface["X_ASB_COM_RxBytes"], 0),
+                        max(iface["X_ASB_COM_TxBytes"], 0),
+                        max(iface["X_ASB_COM_RxPackets"], 0),
+                        max(iface["X_ASB_COM_TxPackets"], 0),
                         timestamp
                     ))
                 except KeyError:
@@ -188,8 +208,8 @@ class Exporter:
                     interfaces.append((
                         GATEWAY_NAME,
                         'cell',
-                        iface["BytesReceived"],
-                        iface["BytesSent"],
+                        max(iface["BytesReceived"], 0),
+                        max(iface["BytesSent"], 0),
                         # The API doesn't expose packets sent/received
                         # on the cellular interface for some reason
                         None,
