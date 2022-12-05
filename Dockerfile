@@ -1,4 +1,4 @@
-FROM python:3.9-slim
+FROM python:3.11-slim-buster
 
 COPY . /exporter
 
@@ -6,4 +6,4 @@ WORKDIR /exporter
 
 RUN pip install -r requirements.txt
 
-ENTRYPOINT ["python", "-u", "exporter.py"]
+ENTRYPOINT ["python", "-u", "tmobile.py"]

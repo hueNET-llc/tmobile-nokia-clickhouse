@@ -10,8 +10,9 @@ A T-Mobile Nokia 5G Gateway exporter for ClickHouse
 GATEWAY_NAME    -   The device name (e.g. "gateway", default: "trashcan")
 GATEWAY_URL     -   The modem's URL (e.g. "http://192.168.12.1", default: "http://192.168.12.1")
 
-=== Scraping ===
+=== Exporter ===
 SCRAPE_DELAY    -   How long to wait in between scrapes (e.g. "10" for 10 seconds, default: "10")
+LOG_LEVEL       -   Logging verbosity (default: "20"), levels: 0 (debug) / 10 (info) / 20 (warning) / 30 (error) / 40 (critical)
 
 === ClickHouse ===
 CLICKHOUSE_URL                  -   ClickHouse URL (e.g. "https://192.168.0.69:8123")

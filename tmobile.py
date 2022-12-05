@@ -38,7 +38,7 @@ STATUS_TABLE = os.environ.get(
     'CLICKHOUSE_STATUS_TABLE',
     'cell_status'
 )
-class Exporter:
+class TMobile:
     async def start(self):
         # Create a ClientSession that doesn't verify SSL certificates
         self.session = aiohttp.ClientSession(
@@ -232,4 +232,4 @@ class Exporter:
                 await asyncio.sleep(SCRAPE_DELAY)
 
 loop = asyncio.new_event_loop()
-loop.run_until_complete(Exporter().start())
+loop.run_until_complete(TMobile().start())
