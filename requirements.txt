@@ -1,2 +1,4 @@
 aiochclient
 aiohttp
+colorlog
+uvloop
